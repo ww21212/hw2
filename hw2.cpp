@@ -5,14 +5,13 @@ using namespace std::chrono;
 DigitalIn bt_up(D12);      // D12
 DigitalIn bt_down(D11);    // D11
 DigitalIn bt_sl(D10);      // D10
-//InterruptIn button(USER_BUTTON); 
-//DigitalOut led_up(LED1);
 DigitalOut led_down(LED2);
 DigitalOut led_sl(LED3);
 AnalogOut  aout(D7);
 AnalogOut  Aout(D13);
 AnalogIn ain(A0);
 Timer t;
+bool sample_finished = 0;
 int freq = 0;
 int sample = 500;
 float ADCdata[500];
@@ -26,40 +25,44 @@ void wave()
 {   
     float i;
     while (1){
-        if (freq == 1) {        // 200Hz
+        if (freq == 1 && !sample_finished) {        // 200Hz
             for (i = 0.0f; i < 1; i+=0.0145635f) {
                 aout = i;
             }
             for (i = 1.0f; i > 0.0f; i -= 0.001626f) {
                 aout = i;
             }
-        } else if(freq == 2) {  // 1 Hz
-            for (i = 0.0f; i < 1; i+=0.000109f) {
+        } else if(freq == 2 && !sample_finished) {  // 1 Hz
+            for (i = 0.0f; i < 1; i+=0.00007455502f) {
                 aout = i;
             }
-            for (i = 1.0f; i > 0.0f; i -= 0.000012f) {
+            for (i = 1.0f; i > 0.0f; i -= 0.000008283891f) {
                 aout = i;
                 // ThisThread::sleep_for(1ms);
             }
-        } else {    // >> 10*200Hz
+        } else if (!sample_finished) {    // >> 10*200Hz
             for (i = 0.0f; i < 1; i+=0.27f) {
                 aout = i;
             }
             for (i = 1.0f; i > 0.0f; i -= 0.03f) {
                 aout = i;
             }
+        } else {
+            aout = 0.0f;
         }
     }
 }
 
 void wave_sampling() {
     int i = 0;
+    sample_finished = 0;
     //t.start();
     for (i = 0; i < sample; i++){
         Aout = ain;
         ADCdata[i] = ain;
         ThisThread::sleep_for(1000ms/sample); // sampling rate = 500/s 實際55/s
     }
+    sample_finished = 1;
     //t.stop();
     //auto ms = chrono::duration_cast<chrono::milliseconds>(t.elapsed_time()).count();
     for (i = 0; i < sample; i++) {
@@ -71,7 +74,7 @@ void wave_sampling() {
 
 int main()
 {
-    int pre_freq = 0;
+    int pre_freq = 1;
     // bool sl = 0;
 
     // Optional: set mode as PullUp/PullDown/PullNone/OpenDrain
@@ -119,6 +122,7 @@ int main()
                 pre_freq = 2;
             } else if (bt_sl.read()) {
                 freq = pre_freq;
+                //wave_sampling();
                 pre_freq = 0;
             }
         } else if (freq == 2) {
@@ -146,16 +150,12 @@ int main()
             uLCD.locate(1,4);
             uLCD.printf("freq_2");
 
-            // no wave
-            // thread.join();
-
             if (bt_up.read() == 1) {
                 pre_freq = 1;
             } else if (bt_down.read() == 1) {
                 pre_freq = 2;
             } else if (bt_sl.read() == 1) {
                 freq = pre_freq;
-                //wave_sampling();
                 pre_freq = 0;
             }
         }
