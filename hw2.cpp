@@ -33,10 +33,10 @@ void wave()
                 aout = i;
             }
         } else if(freq == 2 && !sample_finished) {  // 1 Hz
-            for (i = 0.0f; i < 1; i+=0.00007455502f) {
+            for (i = 0.0f; i < 1; i += 0.0000731f) {
                 aout = i;
             }
-            for (i = 1.0f; i > 0.0f; i -= 0.000008283891f) {
+            for (i = 1.0f; i > 0.0f; i -= 0.00000812222f) {
                 aout = i;
                 // ThisThread::sleep_for(1ms);
             }
@@ -56,7 +56,7 @@ void wave()
 void wave_sampling() {
     int i = 0;
     sample_finished = 0;
-    //t.start();
+    t.start();
     for (i = 0; i < sample; i++){
         Aout = ain;
         ADCdata[i] = ain;
@@ -159,7 +159,6 @@ int main()
                 pre_freq = 0;
             }
         }
-
         // ThisThread::sleep_for(100ms);
     }
 }
