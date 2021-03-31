@@ -38,7 +38,6 @@ void wave()
             }
             for (i = 1.0f; i > 0.0f; i -= 0.00000812222f) {
                 aout = i;
-                // ThisThread::sleep_for(1ms);
             }
         } else if (!sample_finished) {    // >> 10*200Hz
             for (i = 0.0f; i < 1; i+=0.27f) {
@@ -56,11 +55,11 @@ void wave()
 void wave_sampling() {
     int i = 0;
     sample_finished = 0;
-    t.start();
+    //t.start();
     for (i = 0; i < sample; i++){
         Aout = ain;
         ADCdata[i] = ain;
-        ThisThread::sleep_for(1000ms/sample); // sampling rate = 500/s 實際55/s
+        ThisThread::sleep_for(1000ms/sample); // sampling rate = 500/s 實際166.666667/s
     }
     sample_finished = 1;
     //t.stop();
@@ -159,6 +158,5 @@ int main()
                 pre_freq = 0;
             }
         }
-        // ThisThread::sleep_for(100ms);
     }
 }
